@@ -1,0 +1,41 @@
+version: "3.3"
+
+networks:
+  default:
+    name: project
+
+volumes:
+  mysql_volume:
+    name: mysql_vol
+
+services:
+  mysql:
+    image: mysql
+    container_name: mysql
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    restart: always
+    ports:
+      - 13306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress_user
+      MYSQL_PASSWORD: password
+
+  wordpress:
+    image: wordpress:latest
+    container_name: wordpress
+    depends_on:
+        - mysql
+    volumes:
+      - ./wordpress:/var/www/html
+      - ./plugins:/var/www/html/wp-content/plugins
+    ports:
+        - 8080:80
+    restart: always
+    environment:
+        WORDPRESS_DB_HOST: mysql:3306
+        WORDPRESS_DB_USER: wordpress_user
+        WORDPRESS_DB_PASSWORD: password
+        WORDPRESS_DB_NAME: wordpress
